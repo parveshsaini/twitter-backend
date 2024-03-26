@@ -1,8 +1,9 @@
 import { User } from "@prisma/client"
 import jwt from "jsonwebtoken"
+import { JWTUser } from "../interface"
 
 const generateToken = (user: User)=> {
-    const payload= {
+    const payload: JWTUser= {
         id: user?.id,
         email: user?.email
     }
@@ -12,4 +13,15 @@ const generateToken = (user: User)=> {
     return token
 }
 
-export const jwtService= {generateToken}
+const decodeToken= (token: string)=> {
+    const decoded= jwt.verify(token, process.env.JWT_SECRET!) as JWTUser
+
+    if(!decoded){
+        throw new Error('Invalid token')
+    }
+
+    return decoded
+    
+}
+
+export const jwtService= {generateToken, decodeToken}
