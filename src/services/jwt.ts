@@ -14,13 +14,20 @@ const generateToken = (user: User)=> {
 }
 
 const decodeToken= (token: string)=> {
-    const decoded= jwt.verify(token, process.env.JWT_SECRET!) as JWTUser
+   try {
+     const decoded= jwt.verify(token, process.env.JWT_SECRET!) as JWTUser
+ 
+     if(!decoded){
+         throw new Error('Invalid token')
+     }
+ 
+     return decoded
 
-    if(!decoded){
-        throw new Error('Invalid token')
-    }
+   } catch (error) {
 
-    return decoded
+    return null
+    //  throw new Error(`backend error: ${error}`)
+   }
     
 }
 

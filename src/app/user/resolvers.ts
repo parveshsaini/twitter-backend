@@ -2,6 +2,7 @@ import axios from "axios"
 import { prismaClient } from "../../clients/db";
 import { jwtService } from "../../services/jwt";
 import { GraphqlContext } from "../../interface";
+import { User } from "@prisma/client";
 
 interface IGoogleToekenResponse {
     iss?: string;
@@ -78,8 +79,25 @@ const queries = {
         })
 
         return user
+    },
+
+}
+
+const mutations= {
+
+}
+
+const extraResolvers= {
+    User: {
+        tweets: async (_parent: User)=> {
+            return await prismaClient.tweet.findMany({
+                where: {
+                    authorId: _parent.id
+                }
+            })
+        }
     }
 }
 
 
-export const resolvers = {queries}
+export const resolvers = {queries, mutations, extraResolvers}

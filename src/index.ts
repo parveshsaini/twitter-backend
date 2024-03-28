@@ -3,9 +3,12 @@ import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
 import express from 'express';
 
-import { User } from './app/user';
 import { GraphqlContext } from './interface';
 import { jwtService } from './services/jwt';
+
+import { User } from './app/user';
+import { Tweet } from './app/tweet';
+
 
 async function init() {
     const PORT = Number(process.env.PORT) || 3000
@@ -17,21 +20,35 @@ async function init() {
     const server= new ApolloServer<GraphqlContext>({
         typeDefs: `
             ${User.types}
+            ${Tweet.types}
 
             type Query {
                 ${User.queries}
+                ${Tweet.queries}
+            }
+
+            type Mutation {
+                ${Tweet.mutations}
+                ${User.mutations}
             }
         `,
         resolvers: {
             Query: {
-               ...User.resolvers.queries 
-            }
+               ...User.resolvers.queries,
+               ...Tweet.resolvers.queries
+            },
+
+            Mutation: {
+                ...Tweet.resolvers.mutations,
+                ...User.resolvers.mutations
+            },
+            
+            ...User.resolvers.extraResolvers,
+            ...Tweet.resolvers.extraResolvers
         }
     })
 
     await server.start()
-
-
 
     app.use(
         "/graphql", 
