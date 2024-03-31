@@ -81,6 +81,18 @@ const queries = {
         return user
     },
 
+    getUserById: async(_parent: any, {id}: {id: string})=> {
+        const user= await prismaClient.user.findUnique({
+            where: {id}
+        })
+
+        if(!user){
+            return null
+        }
+
+        return user
+    }
+
 }
 
 const mutations= {
