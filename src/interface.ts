@@ -6,4 +6,9 @@ export interface JWTUser {
 export interface GraphqlContext{
     user?: JWTUser
 }
+
+export interface CreateTweetPayload {
+    content: string;
+    imageUrl?: string;
+}
     
