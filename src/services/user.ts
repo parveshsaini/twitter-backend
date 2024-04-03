@@ -89,8 +89,30 @@ const getUserByIdService= async(id: string)=> {
     return user
 }
 
+const followUserService= async(from: string, to: string)=> {
+    await prismaClient.follows.create({
+        data: {
+            follower: { connect: { id: from} },
+            following: { connect: { id: to } }
+        }
+    })
+}
+
+const unfollowUserService= async(from: string, to: string)=> {
+    await prismaClient.follows.delete({
+        where: {
+            followerId_followingId: {
+                followerId: from,
+                followingId: to
+            }
+        }
+    })
+}
+
 export const UserServices= {
     verifyGoogleTokenService, 
     getCurrentUserService, 
     getUserByIdService,
+    followUserService,
+    unfollowUserService
 }
