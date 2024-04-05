@@ -4,6 +4,7 @@ import { User } from "@prisma/client";
 import { UserServices } from "../../services/user";
 import { TweetServices } from "../../services/tweet";
 import { prismaClient } from "../../clients/db";
+import { redisClient } from "../../clients/redis";
   
 
 const queries = {
@@ -14,15 +15,29 @@ const queries = {
 
     getCurrentUser: async(_parent: any, args: any, ctx: GraphqlContext)=> {
         const id =  ctx.user?.id
-
         if(!id) return null
 
+        const cachedCurrentUser= await redisClient.get(`CURRENT_USER:${id}`)
+        if(cachedCurrentUser){
+          return JSON.parse(cachedCurrentUser)
+        }
+
         const user= await UserServices.getCurrentUserService(id)
+
+        redisClient.set(`CURRENT_USER:${id}`, JSON.stringify(user))
+
         return user
     },
 
     getUserById: async(_parent: any, {id}: {id: string})=> {
+        const cachedUser= await redisClient.get(`USER:${id}`)
+        if(cachedUser){
+          return JSON.parse(cachedUser)
+        }
+
         const user= await UserServices.getUserByIdService(id)
+
+        redisClient.set(`USER:${id}`, JSON.stringify(user))
         return user
     }
 
@@ -41,6 +56,7 @@ const mutations= {
         }
 
         await UserServices.followUserService(from, to)
+        await redisClient.del(`RECOMMENDED_USERS:${from}`)
 
         return true
     },
@@ -57,6 +73,8 @@ const mutations= {
         }
 
         await UserServices.unfollowUserService(from, to)
+        await redisClient.del(`RECOMMENDED_USERS:${from}`)
+
         return true
     }
 }
@@ -91,6 +109,13 @@ const extraResolvers= {
 
         recommendedUsers: async (_parent: User, _: any, ctx: GraphqlContext) => {
             if (!ctx.user) return [];
+
+            //cehck for cached users
+            const cachedUsers= await redisClient.get(`RECOMMENDED_USERS:${ctx.user.id}`)
+            if(cachedUsers){
+              return JSON.parse(cachedUsers)
+            }
+
             const myFollowings = await prismaClient.follows.findMany({
               where: {
                 follower: { id: ctx.user.id },
@@ -116,6 +141,10 @@ const extraResolvers= {
                 }
               }
             }
+            
+            //cache recommended users
+            redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}`, JSON.stringify(users))
+
             return users;
           },
     }

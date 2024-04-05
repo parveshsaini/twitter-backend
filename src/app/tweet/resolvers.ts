@@ -1,17 +1,24 @@
 import { Tweet } from "@prisma/client";
-import { prismaClient } from "../../clients/db";
 import { GraphqlContext } from "../../interface";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { UserServices } from "../../services/user";
 import { TweetServices } from "../../services/tweet";
 import { CreateTweetPayload } from "../../interface";
+import { redisClient } from "../../clients/redis";
 
 
 const queries= {
     
     getAllTweets: async () =>{
-        return await TweetServices.gettAllTweetsService()
+        const cachedTweets= await redisClient.get(`ALL_TWEETS`)
+        if(cachedTweets){
+            return JSON.parse(cachedTweets)
+        }
+        
+        const tweets= await TweetServices.gettAllTweetsService()
+
+        redisClient.set(`ALL_TWEETS`, JSON.stringify(tweets))
+
+        return tweets
     },
 
     getSignedUrl: async(_parent: any, {imageName, imageType}: {imageName: string, imageType: string}, ctx: GraphqlContext) => {
@@ -34,7 +41,17 @@ const mutations = {
                     throw new Error("Unauthorized")
                 }
 
+                const rateLimitFlag= await redisClient.get(`RATE_LIMIT:${ctx.user.id}`)
+                if(rateLimitFlag){
+                    throw new Error("Wait for few seconds before trying again :/")
+                }
+
                 const tweet= await TweetServices.createTweetService(payload, ctx.user.id)
+                await redisClient.del(`ALL_TWEETS`)
+                
+                //rate limiting for 10 seconds
+                redisClient.setex(`RATE_LIMIT:${ctx.user.id}`, 10,1)
+
                 return tweet
         }
 }
