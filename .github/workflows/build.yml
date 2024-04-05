@@ -30,4 +30,4 @@ jobs:
         run: pnpm dlx prisma generate
 
       - name: Run Build
-        run: pnpm dev
+        run: pnpm build
