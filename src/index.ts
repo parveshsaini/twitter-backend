@@ -17,6 +17,12 @@ async function init() {
     app.use(cors())
     app.use(express.json())
 
+    app.get("/", (req, res)=> {
+        res.status(200).json({
+            message: "Server Health"
+        })
+    })
+
     const server= new ApolloServer<GraphqlContext>({
         typeDefs: `
             ${User.types}
