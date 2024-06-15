@@ -8,6 +8,7 @@ import { jwtService } from './services/jwt';
 
 import { User } from './app/user';
 import { Tweet } from './app/tweet';
+import { Chat } from './app/chat';
 
 
 async function init() {
@@ -27,26 +28,31 @@ async function init() {
         typeDefs: `
             ${User.types}
             ${Tweet.types}
+            ${Chat.types}
 
             type Query {
                 ${User.queries}
                 ${Tweet.queries}
+                ${Chat.queries}
             }
 
             type Mutation {
                 ${Tweet.mutations}
                 ${User.mutations}
+                ${Chat.mutations}
             }
         `,
         resolvers: {
             Query: {
                ...User.resolvers.queries,
-               ...Tweet.resolvers.queries
+               ...Tweet.resolvers.queries,
+               ...Chat.resolvers.queries
             },
 
             Mutation: {
                 ...Tweet.resolvers.mutations,
-                ...User.resolvers.mutations
+                ...User.resolvers.mutations,
+                ...Chat.resolvers.mutations
             },
             
             ...User.resolvers.extraResolvers,

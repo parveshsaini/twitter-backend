@@ -12,5 +12,9 @@ export const types = `#graphql
         following: [User]
 
         recommendedUsers: [User]
+
+        conversations: [Conversation]
+
+        messages: [Message]
     }
 `

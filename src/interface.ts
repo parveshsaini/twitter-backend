@@ -11,4 +11,8 @@ export interface CreateTweetPayload {
     content: string;
     imageUrl?: string;
 }
+export interface SendMessagePayload {
+    body: string;
+    recieverId: string;
+}
     
