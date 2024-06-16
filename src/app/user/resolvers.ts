@@ -107,6 +107,16 @@ const extraResolvers= {
             return res.map((r)=> r.following)
         },
 
+        messages: async (_parent: User)=>{
+          const messages= await prismaClient.message.findMany({
+            where:{ senderId: _parent.id},
+            include: {conversation: true, 
+              sender: true}
+          })
+
+          return messages
+        },
+
         recommendedUsers: async (_parent: User, _: any, ctx: GraphqlContext) => {
             if (!ctx.user) return [];
 

@@ -8,7 +8,6 @@ export const types = `#graphql
         id: ID!
         
         participants: [User]
-
         messages: [Message]
     }
 
@@ -21,7 +20,6 @@ export const types = `#graphql
         updatedAt: String
 
         conversation: Conversation
-
         sender: User
     }
 `

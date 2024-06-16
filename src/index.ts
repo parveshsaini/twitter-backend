@@ -9,11 +9,11 @@ import { jwtService } from './services/jwt';
 import { User } from './app/user';
 import { Tweet } from './app/tweet';
 import { Chat } from './app/chat';
+import { app, httpServer } from './socket/socket';
 
 
 async function init() {
     const PORT = Number(process.env.PORT) || 3000
-    const app = express()
 
     app.use(cors())
     app.use(express.json())
@@ -73,7 +73,7 @@ async function init() {
             }
         }))
 
-    app.listen(PORT, ()=> console.log(`Server is running on port ${PORT}`))
+    httpServer.listen(PORT, ()=> console.log(`Server is running on port ${PORT}`))
 }
 
 init()

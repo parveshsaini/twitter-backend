@@ -3,7 +3,7 @@ export const types = `#graphql
         id: ID!
         firstName: String!
         lastName: String 
-        email: String!
+        email: String
         profileImageUrl: String
 
         tweets: [Tweet]

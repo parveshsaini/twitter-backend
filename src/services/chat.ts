@@ -1,5 +1,6 @@
 import { prismaClient } from "../clients/db";
 import { SendMessagePayload } from "../interface";
+import { getReceiverSocketId, io } from "../socket/socket";
 
 const sendMessageService= async(payload: SendMessagePayload, senderId: string)=>{
     const {recieverId, body} = payload
@@ -45,6 +46,12 @@ const sendMessageService= async(payload: SendMessagePayload, senderId: string)=>
                 },
             });
         }
+
+        const receiverSocketId = getReceiverSocketId(recieverId);
+
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("newMessage", newMessage);
+		}
     
         return newMessage
 
@@ -55,7 +62,14 @@ const sendMessageService= async(payload: SendMessagePayload, senderId: string)=>
 
 const getUsersForSidebarService= async()=> {
     try {
-        const users= await prismaClient.user.findMany()
+        const users= await prismaClient.user.findMany({
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profileImageUrl: true                
+            }
+        })
         return users
     } catch (error) {
         console.log('error getting users for sidebar', error)
@@ -76,7 +90,11 @@ const getMessagesService= async(senderId: string, recieverId: string)=>{
 					orderBy: {
 						createdAt: "asc",
 					},
+                    include:{
+                        sender: true
+                    }
 				},
+
 			},
         })
 

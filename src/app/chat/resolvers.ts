@@ -1,5 +1,7 @@
+import { Message } from "@prisma/client"
 import { GraphqlContext, SendMessagePayload } from "../../interface"
 import { ChatServices } from "../../services/chat"
+import { UserServices } from "../../services/user"
 
 const queries= {
     getMessages: async(
@@ -55,6 +57,14 @@ const mutations = {
 
                 return message
         }
+}
+
+const extraResolvers = {
+    Message: {
+        author: async (_parent: Message)=> {
+            return await UserServices.getUserByIdService(_parent.senderId)
+        }
+    }
 }
 
 export const resolvers= {
