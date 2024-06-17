@@ -58,7 +58,7 @@ model Message {
 
   body      String
   
-  createdAt DateTime @default(now())
+  createdAt String @default(dbgenerated("to_char(now(), 'YYYY-MM-DD HH24:MI:SS')"))  // Store as a formatted string
   updatedAt DateTime @updatedAt
 }
 

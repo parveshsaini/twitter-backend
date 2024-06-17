@@ -2,6 +2,8 @@ import { Message } from "@prisma/client"
 import { GraphqlContext, SendMessagePayload } from "../../interface"
 import { ChatServices } from "../../services/chat"
 import { UserServices } from "../../services/user"
+import { getReceiverSocketId, io } from "../../socket/socket"
+import { produceMessage } from "../../clients/kafka"
 
 const queries= {
     getMessages: async(
@@ -49,13 +51,33 @@ const mutations = {
                 }
 
                 const body= payload.body
+                const recieverId= payload.recieverId
                 const senderId= ctx.user.id
 
                 if(!body) throw new Error("Body cannot be empty")
-                
-                const message= await ChatServices.sendMessageService(payload, senderId)
 
-                return message
+                const temporaryMessage = {
+                    sender: {
+                        id: senderId, 
+                    },
+                    body,
+                    createdAt: new Date().toISOString(), 
+                };
+        
+                // Emit the temporary message before any database operations
+                const receiverSocketId = getReceiverSocketId(recieverId);
+                const senderSocketId = getReceiverSocketId(senderId);
+                if (receiverSocketId) {
+                    console.log('temprary mss emiting', temporaryMessage)
+                    io.to(receiverSocketId).emit("newMessage", temporaryMessage);
+                    io.to(senderSocketId).emit("newMessage", temporaryMessage);
+                }
+        
+                await produceMessage(temporaryMessage.body, recieverId, senderId);
+                
+                // const message= await ChatServices.sendMessageService(payload, senderId)
+
+                return null
         }
 }
 

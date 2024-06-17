@@ -10,10 +10,13 @@ import { User } from './app/user';
 import { Tweet } from './app/tweet';
 import { Chat } from './app/chat';
 import { app, httpServer } from './socket/socket';
+import { startMessageConsumer } from './clients/kafka';
 
 
 async function init() {
     const PORT = Number(process.env.PORT) || 3000
+
+    startMessageConsumer()
 
     app.use(cors())
     app.use(express.json())
