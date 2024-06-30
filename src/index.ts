@@ -18,13 +18,12 @@ async function init() {
 
     startMessageConsumer()
 
-    app.use(cors(
-        {
-            origin: "*",
-            methods: ["GET", "POST"],
-            allowedHeaders: ["Content-Type", "Authorization"]
-        }
-    ))
+    app.use(cors({
+        origin: true,
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Content-Type", "Authorization"]
+    }));
+    
     app.use(express.json())
 
     app.get("/", (req, res)=> {

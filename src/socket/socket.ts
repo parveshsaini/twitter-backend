@@ -8,9 +8,9 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
 	cors: {
-		origin: ["*"],
-		methods: ["GET", "POST"],
-	},
+        origin: true,
+        methods: ["GET", "POST"]
+    }
 });
 
 sub.subscribe("MESSAGES")
