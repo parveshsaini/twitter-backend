@@ -8,11 +8,15 @@ import { jwtService } from './services/jwt';
 
 import { User } from './app/user';
 import { Tweet } from './app/tweet';
+import { Chat } from './app/chat';
+import { app, httpServer } from './socket/socket';
+import { startMessageConsumer } from './clients/kafka';
 
 
 async function init() {
     const PORT = Number(process.env.PORT) || 3000
-    const app = express()
+
+    startMessageConsumer()
 
     app.use(cors())
     app.use(express.json())
@@ -27,26 +31,31 @@ async function init() {
         typeDefs: `
             ${User.types}
             ${Tweet.types}
+            ${Chat.types}
 
             type Query {
                 ${User.queries}
                 ${Tweet.queries}
+                ${Chat.queries}
             }
 
             type Mutation {
                 ${Tweet.mutations}
                 ${User.mutations}
+                ${Chat.mutations}
             }
         `,
         resolvers: {
             Query: {
                ...User.resolvers.queries,
-               ...Tweet.resolvers.queries
+               ...Tweet.resolvers.queries,
+               ...Chat.resolvers.queries
             },
 
             Mutation: {
                 ...Tweet.resolvers.mutations,
-                ...User.resolvers.mutations
+                ...User.resolvers.mutations,
+                ...Chat.resolvers.mutations
             },
             
             ...User.resolvers.extraResolvers,
@@ -67,7 +76,7 @@ async function init() {
             }
         }))
 
-    app.listen(PORT, ()=> console.log(`Server is running on port ${PORT}`))
+    httpServer.listen(PORT, ()=> console.log(`Server is running on port ${PORT}`))
 }
 
 init()

@@ -1,26 +1,7 @@
 import axios from "axios";
 import { prismaClient } from "../clients/db";
 import { jwtService } from "./jwt";
-
-interface IGoogleToekenResponse {
-    iss?: string;
-    azp?: string;
-    aud?: string;
-    sub?: string;
-    email: string;
-    email_verified: string;
-    nbf?: string;
-    name?: string;
-    picture?: string;
-    given_name: string;
-    family_name?: string;
-    iat?: string;
-    exp?: string;
-    jti?: string;
-    alg?: string;
-    kid?: string;
-    typ?: string;
-  }
+import { IGoogleTokenResponse } from "../interface";
 
 const verifyGoogleTokenService= async(token: string)=> {
     const googleToken= token
@@ -28,9 +9,10 @@ const verifyGoogleTokenService= async(token: string)=> {
 
         googleOAuthUrl.searchParams.append('id_token', googleToken)
 
-        const { data }= await axios.get<IGoogleToekenResponse>(googleOAuthUrl.toString(), {
+        const { data }= await axios.get<IGoogleTokenResponse>(googleOAuthUrl.toString(), {
             responseType: 'json'
         })
+
 
         const existingUser= await prismaClient.user.findUnique({
             where: {
