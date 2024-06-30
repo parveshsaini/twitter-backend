@@ -53,6 +53,17 @@ const mutations = {
                 redisClient.setex(`RATE_LIMIT:${ctx.user.id}`, 10,1)
 
                 return tweet
+        },
+
+        deleteTweet: async (_parent: any, {id}: {id: string}, ctx: GraphqlContext)=> {
+            if(!ctx.user){
+                throw new Error("Unauthorized")
+            }
+
+            const res= await TweetServices.deleteTweetService(id, ctx.user.id)
+            await redisClient.del(`ALL_TWEETS`)
+
+            return res
         }
 }
 

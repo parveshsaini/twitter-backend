@@ -58,9 +58,30 @@ const getTweetsById= async (id: string)=> {
     return tweets
 }
 
+const deleteTweetService= async (id: string, userId: string)=> {
+    const tweet= await prismaClient.tweet.findUnique({
+        where:{id}
+    })
+
+    if(!tweet){
+        throw new Error("Tweet not found")
+    }
+
+    if(tweet.authorId!==userId){
+        throw new Error("Unauthorized")
+    }
+
+    await prismaClient.tweet.delete({
+        where: {id}
+    })
+
+    return true
+}
+
 export const TweetServices= {
     gettAllTweetsService,
     getSignedUrlService,
     createTweetService,
-    getTweetsById
+    getTweetsById,
+    deleteTweetService
 }
