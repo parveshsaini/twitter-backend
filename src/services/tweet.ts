@@ -78,10 +78,92 @@ const deleteTweetService= async (id: string, userId: string)=> {
     return true
 }
 
+const likeTweetService= async(id: string, userId: string)=> {
+    const tweet= await prismaClient.tweet.findUnique({
+        where: {id}
+    })
+
+    if(!tweet){
+        throw new Error("Tweet not found")
+    }
+
+    const isLiked= await prismaClient.likes.findUnique({
+        where: {
+            userId_tweetId: {
+                userId,
+                tweetId: id
+            }
+        }
+    })
+
+    if(isLiked){
+        //already liked
+        return isLiked
+    }
+
+    await prismaClient.likes.create({
+        data: {
+            tweet: { connect: { id } },
+            user: { connect: { id: userId } }
+        }
+    })
+
+    const like= await prismaClient.likes.findUnique({
+        where:{
+            userId_tweetId:{
+                userId,
+                tweetId: id
+            
+            }
+        }
+    })
+    console.log(like)
+    return like
+    
+}
+
+const unlikeTweetService= async(id: string, userId: string)=> {
+    const tweet= await prismaClient.tweet.findUnique({
+        where: {id}
+    })
+
+    if(!tweet){
+        throw new Error("Tweet not found")
+    }
+
+    const isLiked= await prismaClient.likes.findUnique({
+        where: {
+            userId_tweetId: {
+                userId,
+                tweetId: id
+            }
+        }
+    })
+
+    if(!isLiked){
+        //not liked
+        return false
+    }
+
+    await prismaClient.likes.delete({
+        where: {
+            userId_tweetId: {
+                userId,
+                tweetId: id
+            }
+        }
+    })
+
+    return true
+
+}
+
 export const TweetServices= {
     gettAllTweetsService,
     getSignedUrlService,
     createTweetService,
     getTweetsById,
-    deleteTweetService
+    deleteTweetService,
+    likeTweetService,
+    unlikeTweetService
 }

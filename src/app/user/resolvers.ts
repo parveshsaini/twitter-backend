@@ -85,6 +85,13 @@ const extraResolvers= {
             return await TweetServices.getTweetsById(_parent.id)
         },
 
+        likes: async (_parent: User)=> {
+            return await prismaClient.likes.findMany({
+                where: { userId: _parent.id},
+                include: { tweet: true}
+            })
+        },
+
         followers: async (_parent: User)=> {
             const res= await prismaClient.follows.findMany({
                 where: { followingId: _parent.id},

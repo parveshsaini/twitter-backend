@@ -9,7 +9,7 @@ const generateToken = (user: User)=> {
     }
 
     const token = jwt.sign(payload, process.env.JWT_SECRET!)
-    console.log( process.env.JWT_SECRET)
+    // console.log( process.env.JWT_SECRET)
     return token
 }
 

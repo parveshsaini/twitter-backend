@@ -68,7 +68,7 @@ const mutations = {
                 const receiverSocketId = getReceiverSocketId(recieverId);
                 const senderSocketId = getReceiverSocketId(senderId);
                 if (receiverSocketId) {
-                    console.log('temprary mss emiting', temporaryMessage)
+                    // console.log('temprary mss emiting', temporaryMessage)
                     io.to(receiverSocketId).emit("newMessage", temporaryMessage);
                 }
                 io.to(senderSocketId).emit("newMessage", temporaryMessage);

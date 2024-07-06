@@ -1,9 +1,10 @@
-import { Tweet } from "@prisma/client";
+import { Likes, Tweet } from "@prisma/client";
 import { GraphqlContext } from "../../interface";
 import { UserServices } from "../../services/user";
 import { TweetServices } from "../../services/tweet";
 import { CreateTweetPayload } from "../../interface";
 import { redisClient } from "../../clients/redis";
+import { prismaClient } from "../../clients/db";
 
 
 const queries= {
@@ -64,15 +65,28 @@ const mutations = {
             await redisClient.del(`ALL_TWEETS`)
 
             return res
-        }
+        },
+
+        
 }
 
 const extraResolvers = {
     Tweet: {
         author: async (_parent: Tweet)=> {
             return await UserServices.getUserByIdService(_parent.authorId)
+        },
+
+        likes: async (_parent: Tweet)=> {
+            return await prismaClient.likes.findMany({
+                where: {
+                    tweetId: _parent.id
+                }
+            })
         }
-    }
+    },
+
+    
+    
 }
 
 export const resolvers = {queries, mutations, extraResolvers}

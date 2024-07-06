@@ -11,6 +11,7 @@ import { Tweet } from './app/tweet';
 import { Chat } from './app/chat';
 import { app, httpServer } from './socket/socket';
 import { startMessageConsumer } from './clients/kafka';
+import { Likes } from './app/like';
 
 
 async function init() {
@@ -37,6 +38,7 @@ async function init() {
             ${User.types}
             ${Tweet.types}
             ${Chat.types}
+            ${Likes.types}
 
             type Query {
                 ${User.queries}
@@ -48,6 +50,7 @@ async function init() {
                 ${Tweet.mutations}
                 ${User.mutations}
                 ${Chat.mutations}
+                ${Likes.mutations}
             }
         `,
         resolvers: {
@@ -60,11 +63,13 @@ async function init() {
             Mutation: {
                 ...Tweet.resolvers.mutations,
                 ...User.resolvers.mutations,
-                ...Chat.resolvers.mutations
+                ...Chat.resolvers.mutations,
+                ...Likes.resolvers.mutations
             },
             
             ...User.resolvers.extraResolvers,
-            ...Tweet.resolvers.extraResolvers
+            ...Tweet.resolvers.extraResolvers,
+            ...Likes.resolvers.extraResolvers,
         }
     })
 

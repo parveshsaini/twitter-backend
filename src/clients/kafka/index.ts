@@ -47,7 +47,7 @@ export async function startMessageConsumer() {
       autoCommit: true,
       eachMessage: async ({ message, pause }) => {
         if (!message.value || !message.key) return;
-        console.log(`New Message Received..`);
+        // console.log(`New Message Received..`);
         try {
           const keyParts = message.key.toString().split('_');
           if (keyParts.length !== 2) {

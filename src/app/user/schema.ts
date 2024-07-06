@@ -16,5 +16,7 @@ export const types = `#graphql
         conversations: [Conversation]
 
         messages: [Message]
+
+        likes: [Likes]
     }
 `

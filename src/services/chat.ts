@@ -54,7 +54,8 @@ const sendMessageService = async (payload: SendMessagePayload, senderId: string)
         return newMessage;
 
     } catch (error) {
-        console.log('error sending message', error);
+        // console.log('error sending message', error);
+        throw new Error("Error sending message");
     }
 };
 
@@ -129,7 +130,8 @@ const getUsersForSidebarService= async()=> {
         })
         return users
     } catch (error) {
-        console.log('error getting users for sidebar', error)
+        // console.log('error getting users for sidebar', error)
+        throw new Error("Error getting users for sidebar")
     }
 
 }
