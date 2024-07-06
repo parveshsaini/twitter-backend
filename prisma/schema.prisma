@@ -96,5 +96,5 @@ model Likes{
   tweet Tweet @relation(fields: [tweetId], references: [id])
   tweetId String
 
-  @@id(name: "likeId", [userId, tweetId])
+  @@id([userId, tweetId])
 }
