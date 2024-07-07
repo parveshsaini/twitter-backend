@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { PutObjectCommand, S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3"
 import { prismaClient } from "../clients/db"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { CreateTweetPayload } from "../interface"
@@ -27,9 +27,11 @@ const getSignedUrlService= async(imageType: string, imageName: string)=> {
             throw new Error("Invalid image type")
         }
 
+        const imageExtention= imageType.split("/")[1]
+
         const putObjectCommand= new PutObjectCommand({
             Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: `tweets/${imageName}-${Date.now()}.${imageType}`,
+            Key: `tweets/${imageName}-${Date.now()}.${imageExtention}`,
             ContentType: `image/${imageType}` 
         })
 
@@ -58,25 +60,67 @@ const getTweetsById= async (id: string)=> {
     return tweets
 }
 
-const deleteTweetService= async (id: string, userId: string)=> {
-    const tweet= await prismaClient.tweet.findUnique({
-        where:{id}
-    })
+// const deleteTweetService= async (id: string, userId: string)=> {
+//     const tweet= await prismaClient.tweet.findUnique({
+//         where:{id}
+//     })
 
-    if(!tweet){
-        throw new Error("Tweet not found")
+//     if(!tweet){
+//         throw new Error("Tweet not found")
+//     }
+
+//     if(tweet.authorId!==userId){
+//         throw new Error("Unauthorized")
+//     }
+
+//     await prismaClient.tweet.delete({
+//         where: {id}
+//     })
+
+//     return true
+// }
+
+const deleteTweetService = async (id: string, userId: string) => {
+    const tweet = await prismaClient.tweet.findUnique({
+      where: { id },
+    });
+  
+    if (!tweet) {
+      throw new Error("Tweet not found");
     }
-
-    if(tweet.authorId!==userId){
-        throw new Error("Unauthorized")
+  
+    if (tweet.authorId !== userId) {
+      throw new Error("Unauthorized");
     }
+  
+    try {
+        if (tweet.imageUrl) {
+          const url = new URL(tweet.imageUrl);
+          const imagePath = url.pathname.substring(1); // Remove leading slash
+      
+          const deleteObjectCommand = new DeleteObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: imagePath,
+          });
 
-    await prismaClient.tweet.delete({
-        where: {id}
-    })
+          console.log('image path is: ', imagePath)
+      
+          await s3Client.send(deleteObjectCommand);
+        }
+      
+        await prismaClient.likes.deleteMany({
+            where: { tweetId: id }
+        })
+        await prismaClient.tweet.delete({
+          where: { id },
+        });
 
-    return true
-}
+      
+        return true;
+    } catch (error: any) {
+        throw new Error("Failed to delete tweet "+ error);
+    }
+  };
 
 const likeTweetService= async(id: string, userId: string)=> {
     const tweet= await prismaClient.tweet.findUnique({
