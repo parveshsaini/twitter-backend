@@ -1,20 +1,16 @@
-import { Kafka, Producer } from "kafkajs";
-import fs from "fs";
-import path from "path";
-import { prismaClient } from "../db/index";
-import { Message } from "@prisma/client";
+import { Kafka, logLevel, Producer } from "kafkajs";
+
 import { ChatServices } from "../../services/chat";
 
 const kafka = new Kafka({
-  brokers: [process.env.KAFKA_BROKER_STRING!],
-  ssl: {
-    ca: [fs.readFileSync(path.resolve("./ca.pem"), "utf-8")],
-  },
+  brokers: [process.env.KAFKA_REST_URL!],
+  ssl: true,
   sasl: {
-    username: "avnadmin",
-    password: process.env.KAFKA_PASSWORD!,
-    mechanism: "plain",
+      mechanism: 'scram-sha-256',
+      username: process.env.KAFKA_REST_USERNAME!,
+      password: process.env.KAFKA_REST_PASSWORD!
   },
+  logLevel: logLevel.ERROR,
 });
 
 let producer: null | Producer = null;
