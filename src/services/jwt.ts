@@ -1,6 +1,7 @@
 import { User } from "@prisma/client"
 import jwt from "jsonwebtoken"
 import { JWTUser } from "../interface"
+import { logger } from ".."
 
 const generateToken = (user: User)=> {
     const payload: JWTUser= {
@@ -24,7 +25,7 @@ const decodeToken= (token: string)=> {
      return decoded
 
    } catch (error) {
-
+    logger.error(`Error decoding token: ${error}`)
     return null
     //  throw new Error(`backend error: ${error}`)
    }

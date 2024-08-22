@@ -1,3 +1,4 @@
+import { logger } from "..";
 import { prismaClient } from "../clients/db";
 import { produceMessage } from "../clients/kafka";
 import { SendMessagePayload } from "../interface";
@@ -55,6 +56,7 @@ const sendMessageService = async (payload: SendMessagePayload, senderId: string)
 
     } catch (error) {
         // console.log('error sending message', error);
+        logger.error("Error sending message:", error);
         throw new Error("Error sending message");
     }
 };

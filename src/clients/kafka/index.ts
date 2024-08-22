@@ -1,6 +1,7 @@
 import { Kafka, logLevel, Producer } from "kafkajs";
 
 import { ChatServices } from "../../services/chat";
+import { logger } from "../..";
 
 const kafka = new Kafka({
   brokers: [process.env.KAFKA_REST_URL!],
@@ -58,6 +59,7 @@ export async function startMessageConsumer() {
           },
           senderId);
         } catch (err: any) {
+          logger.error("Error processing message:", err.message);
           console.error("Error processing message:", err.message);
           pause();
           setTimeout(() => {
