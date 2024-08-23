@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 import { pub, sub } from "../redis";
+import { logger } from "..";
 
 const app = express();
 
@@ -24,6 +25,7 @@ const userSocketMap: { [key: string]: string } = {}; // {userId: socketId}
 
 io.on("connection", (socket) => {
 	console.log("a user connected", socket.id);
+	logger.info("a user connected", { socketId: socket.id });
 
 	const userId = socket.handshake.query.userId as string;
 
@@ -35,6 +37,7 @@ io.on("connection", (socket) => {
 
 	socket.on("disconnect", () => {
 		console.log("user disconnected", socket.id);
+		logger.info("user disconnected", { socketId: socket.id });
 		delete userSocketMap[userId];
 		// io.emit("getOnlineUsers", Object.keys(userSocketMap));
 		pub.publish("ONLINE_USERS", JSON.stringify(Object.keys(userSocketMap)));

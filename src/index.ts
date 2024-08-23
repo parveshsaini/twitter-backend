@@ -67,7 +67,7 @@ async function init() {
     ))
 
     app.get("/", (req, res)=> {
-        logger.info("Server Healthy")
+        // logger.info("Server Healthy")
         res.status(200).json({
             message: "Server Health"
         })
