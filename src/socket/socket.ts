@@ -1,8 +1,8 @@
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
-import { pub, sub } from "../redis";
 import { logger } from "..";
+import { pub, sub } from "../clients/redis";
 
 const app = express();
 
