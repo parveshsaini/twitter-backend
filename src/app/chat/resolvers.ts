@@ -73,10 +73,10 @@ const mutations = {
                 }
                 io.to(senderSocketId).emit("newMessage", temporaryMessage);
         
-                await produceMessage(temporaryMessage.body, recieverId, senderId);
+                // await produceMessage(temporaryMessage.body, recieverId, senderId);
                 
-                // const message= await ChatServices.sendMessageService(payload, senderId)
-
+                const message= await ChatServices.sendMessageService(payload, senderId)
+                console.log("message saveeeeeeeeeed!!", message)
                 return null
         }
 }

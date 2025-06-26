@@ -46,15 +46,6 @@ const verifyGoogleTokenService= async(token: string)=> {
             throw new Error('User not found')
         }
 
-        if(!existingUser){
-            await prismaClient.follows.create({
-                data:{
-                    follower: { connect: { id: userInDb.id}},
-                    following: { connect: { id: "19dd8498-33e6-44e5-98e9-7b68db817057" }}
-                }
-            })
-        }
-
         const jwtToken= jwtService.generateToken(userInDb)
 
         return jwtToken

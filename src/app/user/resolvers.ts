@@ -100,7 +100,7 @@ const extraResolvers= {
 
             // console.log(res)
 
-            return res.map((r)=> r.follower)
+            return res.map((r: any)=> r.follower)
         },
 
         following: async (_parent: User)=> {
@@ -111,7 +111,7 @@ const extraResolvers= {
 
             // console.log(res)
 
-            return res.map((r)=> r.following)
+            return res.map((r: any)=> r.following)
         },
 
         messages: async (_parent: User)=>{
@@ -151,7 +151,7 @@ const extraResolvers= {
                 if (
                   followingOfFollowedUser.following.id !== ctx.user.id &&
                   myFollowings.findIndex(
-                    (e) => e?.followingId === followingOfFollowedUser.following.id
+                    (e: any) => e?.followingId === followingOfFollowedUser.following.id
                   ) < 0
                 ) {
                   users.push(followingOfFollowedUser.following);

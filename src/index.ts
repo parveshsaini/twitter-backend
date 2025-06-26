@@ -28,13 +28,12 @@ export const logger = createLogger(options);
 
 
 async function init() {
-    const PORT = Number(process.env.PORT) || 3000
+    const PORT = Number(process.env.PORT) || 8080
 
     const collectDefaultMetrics = client.collectDefaultMetrics
     collectDefaultMetrics({ register: client.register })
 
-    startMessageConsumer()
-
+    // startMessageConsumer()
 
     app.use(cors({
         origin: true,
